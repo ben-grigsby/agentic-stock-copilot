@@ -1,1 +1,1 @@
-# stock-analytics-enginer
+# Agentic Stock Copilot
