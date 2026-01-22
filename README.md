@@ -14,7 +14,7 @@ This project is a student-led stock analytics system designed to help users expl
 - A price prediction engine  
 - An autonomous or self-reasoning LLM  
 
-## Core Principles (Non-Negotiable)
+## Core Principles 
 - The LLM does **not** compute numbers  
 - All analytics are deterministic and reproducible  
 - All functions must be documented and explain assumptions  
