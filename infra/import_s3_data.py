@@ -32,8 +32,8 @@ def download_from_s3(bucket_name, s3_key, local_path):
         return False
 
 if __name__ == "__main__":
-    bucket = "stock-copilot-data"
-    key = "raw/daily_bars.csv"
+    bucket = "stock-copilot-data" # just change this to edit which data to pull
+    key = "raw/daily_bars.csv" # just change this to edit which data to pull
     destination = "data/raw/daily_bars.csv"
     
     # Ensure local directory exists
