@@ -24,7 +24,7 @@ def price_graph(df, symbol):
     plt.plot(date, symbol_df["vwap"], label= "Daily Volume Weighted Average Price", color="purple") 
     plt.legend()
     plt.xlabel('Date')
-    plt.ylabel('Value')
+    plt.ylabel('Price')
     plt.title(f'{symbol} Prices Time Plot')
     plt.show()
 
