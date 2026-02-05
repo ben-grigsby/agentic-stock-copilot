@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 
 load_dotenv()
 
+### FILLER FOR RN, DONT NEED TO RUN
+
 client = StockHistoricalDataClient(
     os.getenv("ALPACA_API_KEY"),
     os.getenv("ALPACA_SECRET_KEY"),
