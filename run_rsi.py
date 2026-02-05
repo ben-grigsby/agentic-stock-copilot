@@ -6,7 +6,7 @@ import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from scripts.analysis.rsi_analysis import calculate_rsi, get_current_rsi
+from rsi_analysis import calculate_rsi, get_current_rsi
 
 
 def run():
