@@ -2,43 +2,56 @@
 import pandas as pd
 import numpy as np
 
-def calculate_simple_moving_average(dataframe, ticker, window_days):
-    ticker_df = dataframe[dataframe['symbol'] == ticker].copy()
+def prepare_ticker_data(dataframe, ticker):
+    ticker = ticker.upper()
+    ticker_df = dataframe[dataframe["symbol"] == ticker].copy()
+
     if ticker_df.empty:
-        return ticker_df
+        return None
 
     ticker_df = ticker_df.sort_values("timestamp", ascending=True)
-    # Calculate the simple moving average
-    sma_col = f"sma_{window_days}d"
-    ticker_df[sma_col] = ticker_df['close'].rolling(window=window_days).mean()
-    
     return ticker_df
 
-def calculate_exponential_moving_average(dataframe, ticker, window_days):
-    ticker_df = dataframe[dataframe['symbol'] == ticker].copy()
-    if ticker_df.empty:
-        return ticker_df
-    
-    ticker_df = ticker_df.sort_values("timestamp", ascending=True)
-    # Calculate the exponential moving average
-    ema_col = f"ema_{window_days}d"
-    ticker_df[ema_col] = ticker_df['close'].ewm(span=window_days).mean()
 
+def calculate_sma(dataframe, ticker, window_days):
+    ticker_df = prepare_ticker_data(dataframe, ticker)
+    if ticker_df is None:
+        return None
+
+    sma = ticker_df["close"].rolling(window=window_days).mean().iloc[-1]
+
+    return {
+        "ticker": ticker,
+        "window_days": window_days,
+        "sma": round(float(sma), 2)
+    }
     
+def calculate_ema(dataframe, ticker, window_days):
+    ticker_df = prepare_ticker_data(dataframe, ticker)
+    if ticker_df is None:
+        return None
+
+    ema = ticker_df["close"].ewm(span=window_days).mean().iloc[-1]
+
+    return {
+        "ticker": ticker,
+        "window_days": window_days,
+        "ema": round(float(ema), 2)
+    }
+
 def get_momentum_status(dataframe, ticker, window_days):
-    """
-    Combines SMA and EMA to give a comprehensive momentum 'score'.
-    """
-    sma_df = calculate_simple_moving_average(dataframe, ticker, window_days)
-    ema_df = calculate_exponential_moving_average(dataframe, ticker, window_days)
-    
-    if sma_df.empty or ema_df.empty:
+    ticker_df = prepare_ticker_data(dataframe, ticker)
+    if ticker_df is None:
         return {"error": f"No data found for {ticker}"}
 
-    latest_sma = sma_df.iloc[-1][f'sma_{window_days}d']
-    latest_ema = ema_df.iloc[-1][f'ema_{window_days}d']
-    current_price = sma_df.iloc[-1]['close']
-    
+    current_price = ticker_df.iloc[-1]["close"]
+
+    sma_result = calculate_sma(dataframe, ticker, window_days)
+    ema_result = calculate_ema(dataframe, ticker, window_days)
+
+    latest_sma = sma_result["sma"]
+    latest_ema = ema_result["ema"]
+
     if current_price > latest_ema and latest_ema > latest_sma:
         interpretation = "Strong Bullish: The price is accelerating upwards and is above its long-term average."
         momentum = "High"
@@ -54,9 +67,9 @@ def get_momentum_status(dataframe, ticker, window_days):
 
     return {
         "ticker": ticker,
-        "current_price": round(current_price, 2),
-        "ema": round(latest_ema, 2),
-        "sma": round(latest_sma, 2),
+        "current_price": round(float(current_price), 2),
+        "ema": latest_ema,
+        "sma": latest_sma,
         "momentum": momentum,
         "interpretation": interpretation
     }
