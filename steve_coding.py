@@ -45,10 +45,8 @@ def largest_pct_change(df, indicator, symbol, n):
     # Indicator can be either '+' or '-'. (input by the user) This shows the largest positive or negative percentage change for each stock.
     if indicator == '+':
         df = df.sort_values(by='pct_change', ascending=False)  # Sort in descending order
-        df['pct_change'] = df['pct_change'].round(2)  # Round to 2 decimal places
     elif indicator == '-':
         df = df.sort_values(by='pct_change', ascending=True)    # Sort in ascending order
-        df['pct_change'] = df['pct_change'].round(2)  # Round to 2 decimal places
 
     return df.head(n)   # only shows the first n rows of the dataframe.
 

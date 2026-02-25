@@ -6,14 +6,7 @@ import os
 import pandas as pd
 from datetime import datetime, timedelta
 
-from pathlib import Path
-
-env_path = Path(__file__).resolve().parents[1] / ".env"
-load_dotenv(env_path)
-
 load_dotenv()
-
-### FILLER FOR RN, DONT NEED TO RUN
 
 client = StockHistoricalDataClient(
     os.getenv("ALPACA_API_KEY"),

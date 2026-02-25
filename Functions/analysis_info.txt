@@ -1,0 +1,25 @@
+Analytics Engine Team
+
+Goal:
+Build deterministic stock analysis functions that operate on the shared dataset.
+
+Your responsibility is to implement clean, reusable functions such as:
+- Moving average
+- Percent price change
+- Rolling volatility
+- (Optional) RSI
+
+Requirements:
+- Functions must take a dataframe + arguments (ticker, window, etc.)
+- No API calls inside these functions
+- No printing inside functions
+- Pure logic only
+- Validate inputs (ticker exists, window > 0)
+
+Deliverable:
+A working analytics.py file containing clean, documented functions that return computed values.
+
+You are NOT responsible for:
+- LLM routing
+- User input handling
+- CLI integration
