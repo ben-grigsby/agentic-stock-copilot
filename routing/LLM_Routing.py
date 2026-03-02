@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field
 from SMA_EMA import get_momentum_status
+from Functions.analytics import get_ticker_data
 import pandas as pd
 import os
 from dotenv import load_dotenv
@@ -20,17 +21,43 @@ class MomentumInput(BaseModel):
         20, 
         description="The lookback window in days for the moving averages. Common values are 20, 50, or 200."
     )
+
+class TickerDataInput(BaseModel):
+    ticker: str = Field(
+        ...,
+        description="Stock ticker symbol in uppercase (e.g., 'AAPL', 'NVDA')."
+    )
     
 def momentum_tool(ticker: str, window_days: int):
     if ticker.upper() not in df['symbol'].unique():
         return {"error": f"Sorry, we do not have the data for the stock you're looking for ({ticker})"}
     return get_momentum_status(df, ticker.upper(), window_days)
 
+def ticker_data_tool(ticker: str):
+    ticker = ticker.upper()
+    ticker_df = get_ticker_data(df, ticker)
+
+    if ticker_df is None or ticker_df.empty: #returns same error as above
+        return {"error": f"Sorry, we do not have the data for the stock you're looking for ({ticker})"}
+
+    last_rows = ticker_df.tail(10)[["timestamp", "close"]] # Return last 10 rows only
+
+    return {
+        "ticker": ticker,
+        "latest_data": last_rows.to_dict(orient="records") #needs to be convered to JSON for LLM
+    }
+
+
 TOOLS = {
     "get_momentum_status": {
         "function": momentum_tool,
         "schema": MomentumInput,
         "description": "Analyze stock momentum using SMA and EMA"
+    },
+    "get_ticker_data": {
+        "function": ticker_data_tool,
+        "schema": TickerDataInput,
+        "description": "Retrieve recent historical price data for a stock ticker."
     }
 }
 
@@ -41,6 +68,14 @@ tools_for_llm = [
             "name": "get_momentum_status",
             "description": TOOLS["get_momentum_status"]["description"],
             "parameters": MomentumInput.model_json_schema()
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_ticker_data",
+            "description": TOOLS["get_ticker_data"]["description"],
+            "parameters": TickerDataInput.model_json_schema()
         }
     }
 ]
