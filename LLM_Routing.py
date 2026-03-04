@@ -12,10 +12,10 @@ from Functions.macd import get_macd_status
 from Functions.volume import get_volume_status
 from Functions.volatility import get_volatility_status
 
-df = pd.read_csv('./infra/data/raw/daily_bars.csv')
+df = pd.read_csv('data/raw/daily_bars.csv')
 
 # sample user input
-user_input = 'What is the volatility of Nvidia?'
+#user_input = 'What is the volatility of Nvidia?'
 
 # ----------------------------------------------
 # Define Input Schemas
@@ -185,27 +185,31 @@ model_id = "gemini-2.5-flash"
 
 
 # Model Call
-response = client.models.generate_content(
-    model=model_id,
-    contents=user_input,
-    config=types.GenerateContentConfig(
-        tools=tools_config,
-        system_instruction= 
-        '''
-        You are a specialized Stock Market Analytics Copilot. 
-        Your ONLY purpose is to analyze stock data using your deterministic tools.
+def route_user_question(user_input: str):
 
-        CONSTRAINTS:
-        1. DOMAIN LIMIT: Only answer questions related to stock market data, technical analysis, and financial metrics.
-        2. OUT-OF-SCOPE: If a user asks about the weather, general news, or non-financial topics, decline politely.
-        3. DATA AVAILABILITY: If a tool returns an error saying the data is missing for a ticker, inform the user: "Sorry, we do not have the data for the stock you're looking for."
-        4. DETERMINISTIC ONLY: Never calculate numbers yourself. Always call the appropriate tool.
-        5. NO ADVICE: Provide data and interpretations only; no buy/sell recommendations.
-        
-        '''
-        
+    response = client.models.generate_content(
+        model=model_id,
+        contents=user_input,
+        config=types.GenerateContentConfig(
+            tools=tools_config,
+            system_instruction= 
+            '''
+            You are a specialized Stock Market Analytics Copilot. 
+            Your ONLY purpose is to analyze stock data using your deterministic tools.
+
+            CONSTRAINTS:
+            1. DOMAIN LIMIT: Only answer questions related to stock market data, technical analysis, and financial metrics.
+            2. OUT-OF-SCOPE: If a user asks about the weather, general news, or non-financial topics, decline politely.
+            3. DATA AVAILABILITY: If a tool returns an error saying the data is missing for a ticker, inform the user: "Sorry, we do not have the data for the stock you're looking for."
+            4. DETERMINISTIC ONLY: Never calculate numbers yourself. Always call the appropriate tool.
+            5. NO ADVICE: Provide data and interpretations only; no buy/sell recommendations.
+            
+            '''
+            
+        )
     )
-)
-if response.text:
-    print("Final Answer from Agent:", response.text)
+    if response.text:
+        return f"Final Answer from Agent: {response.text}"    
+    else:
+        return "No response from LLM."
 
